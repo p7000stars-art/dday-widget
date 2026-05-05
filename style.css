@@ -1,0 +1,475 @@
+/* ============================================
+   CSS 변수 (테마 색상, 폰트 등을 한 곳에서 관리)
+   ============================================ */
+:root {
+  /* 라이트 모드 색상 */
+  --bg-primary: #fefcfb;          /* 메인 배경 (살짝 따뜻한 화이트) */
+  --bg-card: #ffffff;             /* 카드 배경 */
+  --bg-soft: #fdf2f4;             /* 부드러운 분홍 배경 */
+  
+  --color-primary: #d4476b;       /* 메인 분홍색 (포인트) */
+  --color-primary-light: #f5b8c8; /* 연한 분홍 */
+  --color-secondary: #6b9bd1;     /* 서브 파랑 */
+  --color-text: #2c1f24;          /* 메인 텍스트 (거의 검정에 가까운 와인색) */
+  --color-text-soft: #8a6c75;     /* 부드러운 텍스트 */
+  --color-text-muted: #b8a0a8;    /* 더 흐린 텍스트 */
+  
+  --border-soft: rgba(212, 71, 107, 0.08);  /* 부드러운 테두리 */
+  --shadow-soft: 0 4px 20px rgba(212, 71, 107, 0.06);  /* 부드러운 그림자 */
+  --shadow-hover: 0 8px 30px rgba(212, 71, 107, 0.12); /* 호버 시 그림자 */
+  
+  /* 폰트 */
+  --font-display: 'Cormorant Garamond', 'Pretendard Variable', serif;  /* D-day 숫자용 우아한 세리프 */
+  --font-body: 'Pretendard Variable', -apple-system, sans-serif;       /* 본문용 깔끔한 산세리프 */
+  
+  /* 사이즈 */
+  --radius-card: 24px;
+  --radius-small: 12px;
+  --spacing-base: 1rem;
+}
+
+/* 다크 모드 자동 적용 (사용자 시스템 설정 따라감) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #1a1416;
+    --bg-card: #221a1d;
+    --bg-soft: #2a1f23;
+    
+    --color-primary: #f08aaa;
+    --color-primary-light: #5a3540;
+    --color-secondary: #8ab5e0;
+    --color-text: #f5e8ec;
+    --color-text-soft: #c4a5b0;
+    --color-text-muted: #7a6770;
+    
+    --border-soft: rgba(240, 138, 170, 0.12);
+    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.3);
+    --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.4);
+  }
+}
+
+/* ============================================
+   기본 리셋 & 베이스 스타일
+   ============================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  font-family: var(--font-body);
+  background: var(--bg-primary);
+  color: var(--color-text);
+  font-weight: 400;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  /* 노션 임베드 시 투명 배경으로 보이게 */
+  background: transparent;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  position: relative;
+}
+
+/* ============================================
+   시즌별 배경 장식 (계절에 따라 자동 변경)
+   ============================================ */
+.season-decoration {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* 떠다니는 장식 요소 공통 스타일 */
+.season-decoration::before,
+.season-decoration::after {
+  content: '';
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.4;
+  animation: float 20s ease-in-out infinite;
+}
+
+.season-decoration::before {
+  top: -100px;
+  left: -100px;
+  background: var(--color-primary-light);
+}
+
+.season-decoration::after {
+  bottom: -100px;
+  right: -100px;
+  background: var(--color-secondary);
+  animation-delay: -10s;
+  opacity: 0.2;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -30px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+/* 떠다니는 이모지 (시즌별로 JS에서 추가) */
+.floating-emoji {
+  position: absolute;
+  font-size: 1.5rem;
+  opacity: 0.3;
+  animation: floatUp 15s linear infinite;
+  user-select: none;
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(110vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% { opacity: 0.3; }
+  90% { opacity: 0.3; }
+  100% {
+    transform: translateY(-10vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* ============================================
+   메인 위젯 컨테이너
+   ============================================ */
+.widget {
+  width: 100%;
+  max-width: 580px;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  /* 페이지 로드 시 부드러운 등장 */
+  animation: widgetEnter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes widgetEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   메인 D-day 카드 (히어로)
+   ============================================ */
+.hero-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-card);
+  padding: 3rem 2rem;
+  text-align: center;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--border-soft);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  /* 분홍 글로우 보더 효과 */
+  background-image: 
+    radial-gradient(circle at top right, rgba(212, 71, 107, 0.04) 0%, transparent 50%),
+    radial-gradient(circle at bottom left, rgba(212, 71, 107, 0.04) 0%, transparent 50%);
+}
+
+.hero-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+/* 카드 상단 분홍 띠 */
+.hero-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    var(--color-primary) 30%, 
+    var(--color-primary) 70%, 
+    transparent 100%);
+}
+
+.hero-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  display: inline-block;
+  /* 하트 부드러운 박동 애니메이션 */
+  animation: heartbeat 2s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  10%, 30% { transform: scale(1.1); }
+  20% { transform: scale(1.05); }
+}
+
+.hero-label {
+  font-size: 0.875rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-text-soft);
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.hero-dday {
+  font-family: var(--font-display);
+  font-size: clamp(3.5rem, 12vw, 5.5rem);  /* 화면 크기에 따라 자동 조정 */
+  font-weight: 400;
+  font-style: italic;
+  color: var(--color-primary);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+  /* 부드러운 페이드인 */
+  opacity: 0;
+  animation: ddayFadeIn 1s ease-out 0.3s forwards;
+}
+
+@keyframes ddayFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.hero-date {
+  font-size: 0.875rem;
+  color: var(--color-text-soft);
+  font-weight: 400;
+  letter-spacing: 0.05em;
+}
+
+.hero-message {
+  margin-top: 1rem;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+  font-family: var(--font-display);
+}
+
+/* ============================================
+   다가오는 기념일 그리드
+   ============================================ */
+.upcoming-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+
+.upcoming-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-small);
+  padding: 1.25rem 1rem;
+  text-align: center;
+  border: 1px solid var(--border-soft);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.upcoming-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft);
+  border-color: var(--color-primary-light);
+}
+
+.upcoming-card.urgent {
+  /* 가까운 기념일은 분홍 강조 */
+  background: linear-gradient(135deg, var(--bg-soft) 0%, var(--bg-card) 100%);
+  border-color: var(--color-primary-light);
+}
+
+.upcoming-icon {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.upcoming-name {
+  font-size: 0.8125rem;
+  color: var(--color-text-soft);
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.upcoming-dday {
+  font-family: var(--font-display);
+  font-size: 1.875rem;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--color-text);
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.upcoming-card.urgent .upcoming-dday {
+  color: var(--color-primary);
+}
+
+.upcoming-date {
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.03em;
+}
+
+/* ============================================
+   마일스톤 카드 (100일, 1주년 등)
+   ============================================ */
+.milestone-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-card);
+  padding: 1.5rem;
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-soft);
+}
+
+.milestone-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-soft);
+  margin-bottom: 1rem;
+  letter-spacing: 0.05em;
+}
+
+.milestone-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.milestone-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.625rem 0.875rem;
+  background: var(--bg-soft);
+  border-radius: var(--radius-small);
+  font-size: 0.875rem;
+  transition: transform 0.2s ease;
+}
+
+.milestone-item:hover {
+  transform: translateX(4px);
+}
+
+.milestone-name {
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.milestone-dday {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--color-primary);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* ============================================
+   푸터 (현재 시간 표시)
+   ============================================ */
+.widget-footer {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-top: 0.5rem;
+  letter-spacing: 0.05em;
+  font-variant-numeric: tabular-nums;  /* 숫자 폭 일정하게 */
+}
+
+.footer-divider {
+  margin: 0 0.5rem;
+  opacity: 0.5;
+}
+
+/* ============================================
+   사랑 메시지 팝업 (클릭 시 나타남)
+   ============================================ */
+.love-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  background: var(--bg-card);
+  color: var(--color-primary);
+  padding: 1.5rem 2rem;
+  border-radius: 100px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.5rem;
+  box-shadow: 0 10px 40px rgba(212, 71, 107, 0.25);
+  pointer-events: none;
+  z-index: 100;
+  border: 2px solid var(--color-primary-light);
+  white-space: nowrap;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.love-popup.show {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
+
+.love-popup.hide {
+  transform: translate(-50%, -100%) scale(0.8);
+  opacity: 0;
+}
+
+/* ============================================
+   반응형 (모바일 최적화)
+   ============================================ */
+@media (max-width: 480px) {
+  body {
+    padding: 1rem;
+  }
+  
+  .hero-card {
+    padding: 2.5rem 1.5rem;
+  }
+  
+  .upcoming-grid {
+    grid-template-columns: repeat(2, 1fr);  /* 모바일에서 2열 고정 */
+  }
+  
+  .upcoming-card {
+    padding: 1rem 0.75rem;
+  }
+  
+  .upcoming-dday {
+    font-size: 1.5rem;
+  }
+}
+
+/* 매우 좁은 화면 (작은 폰) */
+@media (max-width: 360px) {
+  .upcoming-grid {
+    grid-template-columns: 1fr;  /* 1열로 변경 */
+  }
+}

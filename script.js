@@ -22,8 +22,8 @@
 const EVENTS = [
   // 메인 카드에 표시될 이벤트 (제일 첫 번째이면서 hero: true인 것)
   { 
-    name: '우리가 함께한 시간', 
-    date: '2026-04-27', 
+    name: '아직 기다리는중', 
+    date: '2026-05-15',  // 오늘부터 카운트 시작 (이날부터 D+1, D+2... 누적됨)
     icon: '💗', 
     mode: 'count-up',
     hero: true  // ← 메인 카드로 표시할 이벤트는 hero: true 추가
@@ -286,9 +286,9 @@ function renderHero(today) {
   document.getElementById('heroDday').textContent = result.ddayText;
   document.getElementById('heroDate').textContent = `${result.displayDate} 부터`;
   
-  // count-up 모드면 추억의 메시지 표시
+  // count-up 모드면 메시지 표시
   if (heroEvent.mode === 'count-up') {
-    document.getElementById('heroMessage').textContent = '∞ 영원히 함께 ∞';
+    document.getElementById('heroMessage').textContent = '기다리고있을게 💌';
   }
 }
 
@@ -330,8 +330,19 @@ function renderUpcoming(today) {
 
 /**
  * 마일스톤 카드 렌더링
+ * 
+ * 📌 마일스톤 다시 보고 싶으면 아래 SHOW_MILESTONES를 true로 바꾸세요!
  */
 function renderMilestones(today) {
+  // 마일스톤 표시 여부 (false면 항상 숨김)
+  const SHOW_MILESTONES = false;
+  
+  // 마일스톤 숨김 처리
+  if (!SHOW_MILESTONES) {
+    document.getElementById('milestoneCard').style.display = 'none';
+    return;
+  }
+  
   const heroEvent = EVENTS.find(e => e.hero) || EVENTS[0];
   
   // count-up 모드 이벤트가 있을 때만 마일스톤 계산
